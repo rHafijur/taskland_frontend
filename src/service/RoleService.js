@@ -1,10 +1,7 @@
+import ApiService from '@/service/ApiService';
 export const RoleService = {
+    path: '/role',
     getRoles() {
-        return new Promise((resolve, reject) => {
-            resolve([
-                { id: 1, name: 'Admin Dummy' },
-                { id: 2, name: 'User Dummy' }
-            ]);
-        });
+        return ApiService.get('/role');
     }
 };

@@ -1,10 +1,17 @@
+import ApiService from '@/service/ApiService';
+
 export const ProjectService = {
+    path: '/project',
     getProjects() {
-        return new Promise((resolve, reject) => {
-            resolve([
-                { id: 1, title: 'Project 1' },
-                { id: 2, title: 'Project 2' }
-            ]);
-        });
+        return ApiService.get(this.path);
+    },
+    createProject(projectData) {
+        return ApiService.post(this.path, projectData);
+    },
+    updateProject(id, projectData) {
+        return ApiService.put(this.path + '/' + id, projectData);
+    },
+    deleteProject(id) {
+        return ApiService.delete(this.path + '/' + id);
     }
 };

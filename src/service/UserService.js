@@ -1,12 +1,17 @@
+import ApiService from '@/service/ApiService';
+
 export const UserService = {
+    path: '/user',
     getUsers() {
-        return new Promise((resolve, reject) => {
-            resolve([
-                { id: 1, name: 'User 1', email: 'user1@gmail.com', role: 'Admin' },
-                { id: 2, name: 'User 2', email: 'user2@gmail.com', role: 'User' },
-                { id: 3, name: 'User 3', email: 'user3@gmail.com', role: 'User' },
-                { id: 4, name: 'User 4', email: 'user4@gmail.com', role: 'User' }
-            ]);
-        });
+        return ApiService.get(this.path);
+    },
+    createUser(userData) {
+        return ApiService.post(this.path, userData);
+    },
+    updateUser(id, userData) {
+        return ApiService.put(this.path + '/' + id, userData);
+    },
+    deleteUser(id) {
+        return ApiService.delete(this.path + '/' + id);
     }
 };

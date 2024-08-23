@@ -7,17 +7,17 @@ import { UserService } from '../../service/UserService';
 
 onMounted(() => {
     UserService.getUsers().then((data) => {
-        users.value = data;
+        users.value = data.data.data;
     });
     RoleService.getRoles().then((data) => {
-        roles.value = data;
+        roles.value = data.data.data;
     });
 });
 
 const toast = useToast();
 const dt = ref();
-const roles = ref();
-const users = ref();
+const roles = ref([]);
+const users = ref([]);
 const userDialog = ref(false);
 const deleteUserDialog = ref(false);
 const user = ref();
@@ -38,6 +38,21 @@ function hideDialog() {
 }
 
 function saveUser() {
+    if (user.value.id == null) {
+        UserService.createUser(user.value).then((res) => {
+            users.value.push(res.data.data);
+            userDialog.value = false;
+        });
+    } else {
+        UserService.updateUser(user.value.id, user.value).then((res) => {
+            for (var i in users.value) {
+                if (users.value[i].id == user.value.id) {
+                    users.value[i] = res.data.data;
+                }
+            }
+            userDialog.value = false;
+        });
+    }
     submitted.value = true;
 }
 
@@ -52,7 +67,12 @@ function confirmDeleteUser(usr) {
     deleteUserDialog.value = true;
 }
 
-function deleteUser() {}
+function deleteUser() {
+    UserService.deleteUser(user.value.id).then((res) => {
+        users.value = users.value.filter((u) => u.id != user.value.id);
+    });
+    deleteUserDialog.value = false;
+}
 
 function exportCSV() {
     dt.value.exportCSV();
@@ -123,13 +143,13 @@ function exportCSV() {
                 </div>
                 <div>
                     <label for="role" class="block font-bold mb-3">Role</label>
-                    <Select :options="roles" optionLabel="name" optionValue="id" placeholder="Select a Role" v-model="user.role_id"></Select>
-                    <small v-if="submitted && !user.role" class="text-red-500">Email is required.</small>
+                    <Select :options="roles" optionLabel="name" optionValue="id" placeholder="Select a Role" v-model="user.role_id" fluid></Select>
+                    <small v-if="submitted && !user.role_id" class="text-red-500">Role is required.</small>
                 </div>
                 <div>
                     <label for="password" class="block font-bold mb-3">Password</label>
                     <InputText type="password" id="password" v-model.trim="user.password" required="true" autofocus :invalid="submitted && !user.password" fluid />
-                    <small v-if="submitted && !user.password" class="text-red-500">Password is required.</small>
+                    <small v-if="submitted && !user.password && !user.id" class="text-red-500">Password is required.</small>
                 </div>
             </div>
 
