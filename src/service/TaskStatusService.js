@@ -1,10 +1,7 @@
+import ApiService from '@/service/ApiService';
 export const TaskStatusService = {
+    path: '/task_status',
     getTaskStatues() {
-        return new Promise((resolve, reject) => {
-            resolve([
-                { id: 1, title: 'Due' },
-                { id: 2, title: 'Complete' }
-            ]);
-        });
+        return ApiService.get(this.path);
     }
 };

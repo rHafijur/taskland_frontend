@@ -13,5 +13,8 @@ export const TaskService = {
     },
     deleteTask(id) {
         return ApiService.delete(this.path + '/' + id);
+    },
+    completeTask(id) {
+        return ApiService.post(this.path + '/complete', { id });
     }
 };
