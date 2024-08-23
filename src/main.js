@@ -12,6 +12,15 @@ import '@/assets/tailwind.css';
 
 const app = createApp(App);
 
+router.beforeEach(async (to, from) => {
+    if (to.name === 'register') {
+        return;
+    }
+    if (localStorage.getItem('auth_token') == null && to.name !== 'login') {
+        return { name: 'login' };
+    }
+});
+
 app.use(router);
 app.use(PrimeVue, {
     theme: {

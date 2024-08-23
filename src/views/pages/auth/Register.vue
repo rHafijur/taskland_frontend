@@ -6,19 +6,20 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
-const email = ref('admin@example.com');
-const password = ref('12345678');
-const errorMessage = ref(null);
+const name = ref('');
+const email = ref('');
+const password = ref('');
+const password_confirmation = ref('');
+const errorMessages = ref({});
 const submitted = ref(false);
-function login() {
+function register() {
     submitted.value = true;
-    ApiService.post('/login', { email: email.value, password: password.value }).then(
-        (response) => {
-            localStorage.setItem('auth_token', response.data.token);
+    ApiService.post('/register', { email: email.value, password: password.value, password_confirmation: password_confirmation.value, name: name.value }).then(
+        (_) => {
             router.push('/');
         },
         (error) => {
-            errorMessage.value = error.response.data.message;
+            errorMessages.value = error.response.data;
             // console.log();
         }
     );
@@ -31,8 +32,8 @@ function login() {
         <div class="flex flex-col items-center justify-center">
             <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
                 <div class="w-full bg-surface-0 dark:bg-surface-900 py-20 px-8 sm:px-20" style="border-radius: 53px">
-                    <div class="text-center mb-8">
-                        <svg viewBox="0 0 54 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="mb-8 w-16 shrink-0 mx-auto">
+                    <div class="text-center mb-6">
+                        <svg viewBox="0 0 54 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="mb-4 w-16 shrink-0 mx-auto">
                             <path
                                 fill-rule="evenodd"
                                 clip-rule="evenodd"
@@ -49,31 +50,50 @@ function login() {
                                 />
                             </g>
                         </svg>
-                        <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Welcome to TaskLand!</div>
-                        <span class="text-muted-color font-medium">Sign in to continue</span>
+                        <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-2">Welcome to TaskLand!</div>
+                        <span class="text-muted-color font-medium">Sign Up</span>
                     </div>
 
-                    <div class="flex flex-col" :style="{ width: '450px' }">
+                    <div :style="{ width: '450px' }" class="flex flex-col gap-3">
                         <div>
-                            <label for="email1" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Email</label>
-                            <InputText id="email1" type="text" placeholder="Email address" class="w-full md:w-[30rem] mb-1" v-model="email" :invalid="submitted && errorMessage != null" fluid />
-                            <small v-if="submitted && errorMessage != null" class="text-red-500">{{ errorMessage }}</small>
+                            <label for="name" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-1">Name</label>
+                            <InputText id="name" type="text" placeholder="Name" class="w-full md:w-[30rem] mb-1" v-model="name" :invalid="submitted && errorMessages?.errors?.name != null" fluid />
+                            <small v-if="submitted && errorMessages?.errors?.name != null" class="text-red-500">
+                                <ul>
+                                    <li v-for="error of errorMessages.errors.name">{{ error }}</li>
+                                </ul>
+                            </small>
                         </div>
-                        <div class="mt-2">
-                            <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
-                            <Password id="password1" v-model="password" placeholder="Password" :toggleMask="true" class="mb-4" fluid :feedback="false"></Password>
+                        <div>
+                            <label for="email1" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-1">Email</label>
+                            <InputText id="email1" type="text" placeholder="Email address" class="w-full md:w-[30rem] mb-1" v-model="email" :invalid="submitted && errorMessages?.errors?.email != null" fluid />
+                            <small v-if="submitted && errorMessages?.errors?.email != null" class="text-red-500">
+                                <ul>
+                                    <li v-for="error of errorMessages.errors.email">{{ error }}</li>
+                                </ul>
+                            </small>
+                        </div>
+                        <div>
+                            <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-1">Password</label>
+                            <Password id="password1" v-model="password" placeholder="Password" :toggleMask="true" class="mb-1" fluid :feedback="false" :invalid="submitted && errorMessages?.errors?.password != null"></Password>
+                            <small v-if="submitted && errorMessages?.errors?.password != null" class="text-red-500">
+                                <ul>
+                                    <li v-for="error of errorMessages.errors.password">{{ error }}</li>
+                                </ul>
+                            </small>
+                        </div>
+                        <div>
+                            <label for="repassword" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-1">Re-enter Password</label>
+                            <Password id="repassword" v-model="password_confirmation" placeholder="Password" :toggleMask="true" class="mb-1" fluid :feedback="false"></Password>
+                            <small v-if="password_confirmation != '' && password_confirmation != password" class="text-red-500">Must be mached with password</small>
                         </div>
 
-                        <div class="flex items-center justify-between mt-2 mb-8 gap-8">
-                            <!-- <div class="flex items-center">
-                                <Checkbox v-model="checked" id="rememberme1" binary class="mr-2"></Checkbox>
-                                <label for="rememberme1">Remember me</label>
-                            </div> -->
-                            <router-link to="/register" class="pull-rightalign-items-end">
-                                <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Sign Up</span>
+                        <div class="flex items-center justify-between mb-2 gap-8">
+                            <router-link to="/login" class="pull-rightalign-items-end">
+                                <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Sign In</span>
                             </router-link>
                         </div>
-                        <Button label="Sign In" class="w-full" @click="login"></Button>
+                        <Button label="Sign Up" class="w-full" @click="register"></Button>
                     </div>
                 </div>
             </div>
