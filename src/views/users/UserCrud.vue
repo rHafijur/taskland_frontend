@@ -18,6 +18,7 @@ const toast = useToast();
 const dt = ref();
 const roles = ref([]);
 const users = ref([]);
+const errorMessages = ref({});
 const userDialog = ref(false);
 const deleteUserDialog = ref(false);
 const user = ref();
@@ -39,19 +40,29 @@ function hideDialog() {
 
 function saveUser() {
     if (user.value.id == null) {
-        UserService.createUser(user.value).then((res) => {
-            users.value.push(res.data.data);
-            userDialog.value = false;
-        });
-    } else {
-        UserService.updateUser(user.value.id, user.value).then((res) => {
-            for (var i in users.value) {
-                if (users.value[i].id == user.value.id) {
-                    users.value[i] = res.data.data;
-                }
+        UserService.createUser(user.value).then(
+            (res) => {
+                users.value.push(res.data.data);
+                userDialog.value = false;
+            },
+            (error) => {
+                errorMessages.value = error.response.data;
             }
-            userDialog.value = false;
-        });
+        );
+    } else {
+        UserService.updateUser(user.value.id, user.value).then(
+            (res) => {
+                for (var i in users.value) {
+                    if (users.value[i].id == user.value.id) {
+                        users.value[i] = res.data.data;
+                    }
+                }
+                userDialog.value = false;
+            },
+            (error) => {
+                errorMessages.value = error.response.data;
+            }
+        );
     }
     submitted.value = true;
 }
@@ -133,23 +144,39 @@ function exportCSV() {
             <div class="flex flex-col gap-6">
                 <div>
                     <label for="name" class="block font-bold mb-3">Name</label>
-                    <InputText id="name" v-model.trim="user.name" required="true" autofocus :invalid="submitted && !user.name" fluid />
-                    <small v-if="submitted && !user.name" class="text-red-500">Name is required.</small>
+                    <InputText id="name" v-model.trim="user.name" required="true" autofocus :invalid="errorMessages?.errors?.name != null" fluid />
+                    <small v-if="submitted && errorMessages?.errors?.name != null" class="text-red-500">
+                        <ul>
+                            <li v-for="error of errorMessages.errors.name">{{ error }}</li>
+                        </ul>
+                    </small>
                 </div>
                 <div>
                     <label for="email" class="block font-bold mb-3">Email</label>
-                    <InputText id="email" v-model.trim="user.email" required="true" autofocus :invalid="submitted && !user.email" fluid />
-                    <small v-if="submitted && !user.email" class="text-red-500">Email is required.</small>
+                    <InputText id="email" v-model.trim="user.email" required="true" autofocus :invalid="errorMessages?.errors?.email != null" fluid />
+                    <small v-if="submitted && errorMessages?.errors?.email != null" class="text-red-500">
+                        <ul>
+                            <li v-for="error of errorMessages.errors.email">{{ error }}</li>
+                        </ul>
+                    </small>
                 </div>
                 <div>
                     <label for="role" class="block font-bold mb-3">Role</label>
-                    <Select :options="roles" optionLabel="name" optionValue="id" placeholder="Select a Role" v-model="user.role_id" fluid></Select>
-                    <small v-if="submitted && !user.role_id" class="text-red-500">Role is required.</small>
+                    <Select :options="roles" optionLabel="name" optionValue="id" placeholder="Select a Role" v-model="user.role_id" :invalid="errorMessages?.errors?.role_id != null" fluid></Select>
+                    <small v-if="submitted && errorMessages?.errors?.role_id != null" class="text-red-500">
+                        <ul>
+                            <li v-for="error of errorMessages.errors.role_id">{{ error }}</li>
+                        </ul>
+                    </small>
                 </div>
                 <div>
                     <label for="password" class="block font-bold mb-3">Password</label>
-                    <InputText type="password" id="password" v-model.trim="user.password" required="true" autofocus :invalid="submitted && !user.password" fluid />
-                    <small v-if="submitted && !user.password && !user.id" class="text-red-500">Password is required.</small>
+                    <InputText type="password" id="password" v-model.trim="user.password" required="true" autofocus :invalid="errorMessages?.errors?.password != null" fluid />
+                    <small v-if="submitted && errorMessages?.errors?.password != null" class="text-red-500">
+                        <ul>
+                            <li v-for="error of errorMessages.errors.password">{{ error }}</li>
+                        </ul>
+                    </small>
                 </div>
             </div>
 
