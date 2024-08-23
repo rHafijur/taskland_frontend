@@ -81,8 +81,8 @@ function confirmDeleteUser(usr) {
 function deleteUser() {
     UserService.deleteUser(user.value.id).then((res) => {
         users.value = users.value.filter((u) => u.id != user.value.id);
+        deleteUserDialog.value = false;
     });
-    deleteUserDialog.value = false;
 }
 
 function exportCSV() {

@@ -6,14 +6,14 @@ import { ProjectService } from '../../service/ProjectService';
 
 onMounted(() => {
     ProjectService.getProjects().then((data) => {
-        projects.value = data;
+        projects.value = data.data.data;
     });
 });
 
 const toast = useToast();
 const dt = ref();
-const roles = ref();
 const projects = ref();
+const errorMessages = ref({});
 const projectDialog = ref(false);
 const deleteProjectDialog = ref(false);
 const project = ref();
@@ -34,6 +34,31 @@ function hideDialog() {
 }
 
 function saveProject() {
+    if (project.value.id == null) {
+        ProjectService.createProject(project.value).then(
+            (res) => {
+                projects.value.push(res.data.data);
+                projectDialog.value = false;
+            },
+            (error) => {
+                errorMessages.value = error.response.data;
+            }
+        );
+    } else {
+        ProjectService.updateProject(project.value.id, project.value).then(
+            (res) => {
+                for (var i in projects.value) {
+                    if (projects.value[i].id == project.value.id) {
+                        projects.value[i] = res.data.data;
+                    }
+                }
+                projectDialog.value = false;
+            },
+            (error) => {
+                errorMessages.value = error.response.data;
+            }
+        );
+    }
     submitted.value = true;
 }
 
@@ -48,7 +73,12 @@ function confirmDeleteProject(usr) {
     deleteProjectDialog.value = true;
 }
 
-function deleteProject() {}
+function deleteProject() {
+    ProjectService.deleteProject(project.value.id).then((res) => {
+        projects.value = projects.value.filter((u) => u.id != project.value.id);
+        deleteProjectDialog.value = false;
+    });
+}
 
 function exportCSV() {
     dt.value.exportCSV();
@@ -94,6 +124,7 @@ function exportCSV() {
 
                 <Column field="id" header="ID" sortable style="min-width: 12rem"></Column>
                 <Column field="title" header="Title" sortable style="min-width: 16rem"></Column>
+                <Column field="creator_name" header="Created By" sortable style="min-width: 16rem"></Column>
                 <Column :exportable="false" style="min-width: 12rem">
                     <template #body="slotProps">
                         <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editProject(slotProps.data)" />
@@ -107,8 +138,12 @@ function exportCSV() {
             <div class="flex flex-col gap-6">
                 <div>
                     <label for="title" class="block font-bold mb-3">Title</label>
-                    <InputText id="title" v-model.trim="project.title" required="true" autofocus :invalid="submitted && !project.title" fluid />
-                    <small v-if="submitted && !project.title" class="text-red-500">Title is required.</small>
+                    <InputText id="title" v-model.trim="project.title" required="true" autofocus :invalid="errorMessages?.errors?.title != null" fluid />
+                    <small v-if="submitted && errorMessages?.errors?.title != null" class="text-red-500">
+                        <ul>
+                            <li v-for="error of errorMessages.errors.title">{{ error }}</li>
+                        </ul>
+                    </small>
                 </div>
             </div>
 
