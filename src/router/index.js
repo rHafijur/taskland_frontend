@@ -40,7 +40,14 @@ const router = createRouter({
                 {
                     path: '/projects',
                     name: 'projects',
-                    component: () => import('@/views/projects/ProjectCrud.vue')
+                    component: () => import('@/views/projects/ProjectCrud.vue'),
+                    beforeEnter: (to, from, next) => {
+                        if (localStorage.getItem('role_id') == 2) {
+                            next();
+                        } else {
+                            next('/accessdenied');
+                        }
+                    }
                 }
             ]
         },
