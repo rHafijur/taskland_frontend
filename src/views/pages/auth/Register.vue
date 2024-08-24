@@ -15,7 +15,9 @@ const submitted = ref(false);
 function register() {
     submitted.value = true;
     ApiService.post('/register', { email: email.value, password: password.value, password_confirmation: password_confirmation.value, name: name.value }).then(
-        (_) => {
+        (response) => {
+            localStorage.setItem('auth_token', response.data.token);
+            localStorage.setItem('role_id', response.data.user.role_id);
             router.push('/');
         },
         (error) => {

@@ -209,7 +209,7 @@ function exportCSV() {
                 </Column>
                 <Column :exportable="false" style="min-width: 12rem">
                     <template #body="slotProps">
-                        <Button icon="pi pi-check-square" outlined class="mr-2" @click="completeTask(slotProps.data.id)" />
+                        <Button v-if="slotProps.data.completed_at == null" icon="pi pi-check-square" outlined class="mr-2" @click="completeTask(slotProps.data.id)" />
                         <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editTask(slotProps.data)" />
                         <Button icon="pi pi-trash" outlined rounded severity="danger" @click="confirmDeleteTask(slotProps.data)" />
                     </template>
