@@ -15,6 +15,7 @@ function login() {
     ApiService.post('/login', { email: email.value, password: password.value }).then(
         (response) => {
             localStorage.setItem('auth_token', response.data.token);
+            localStorage.setItem('role_id', response.data.user.role_id);
             router.push('/');
         },
         (error) => {

@@ -16,12 +16,26 @@ const router = createRouter({
                 {
                     path: '/users',
                     name: 'users',
-                    component: () => import('@/views/users/UserCrud.vue')
+                    component: () => import('@/views/users/UserCrud.vue'),
+                    beforeEnter: (to, from, next) => {
+                        if (localStorage.getItem('role_id') == 1) {
+                            next();
+                        } else {
+                            next('/accessdenied');
+                        }
+                    }
                 },
                 {
                     path: '/tasks',
                     name: 'tasks',
-                    component: () => import('@/views/tasks/TaskCrud.vue')
+                    component: () => import('@/views/tasks/TaskCrud.vue'),
+                    beforeEnter: (to, from, next) => {
+                        if (localStorage.getItem('role_id') == 2) {
+                            next();
+                        } else {
+                            next('/accessdenied');
+                        }
+                    }
                 },
                 {
                     path: '/projects',
@@ -41,7 +55,7 @@ const router = createRouter({
             component: () => import('@/views/pages/auth/Register.vue')
         },
         {
-            path: '/auth/access',
+            path: '/accessdenied',
             name: 'accessDenied',
             component: () => import('@/views/pages/auth/Access.vue')
         },

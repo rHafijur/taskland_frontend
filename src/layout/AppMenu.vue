@@ -1,16 +1,23 @@
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 
 import AppMenuItem from './AppMenuItem.vue';
 
+import { MenuService } from '@/service/MenuService';
+
+onMounted(() => {
+    MenuService.getMenu().then((data) => {
+        model.value = data.data;
+    });
+});
+
 const model = ref([
     {
-        // label: 'Home',
         items: [
-            { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' },
-            { label: 'User', icon: 'pi pi-fw pi-user', to: '/users' },
-            { label: 'Projects', icon: 'pi pi-fw pi-list', to: '/projects' },
-            { label: 'Tasks', icon: 'pi pi-fw pi-check-square', to: '/tasks' }
+            { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' }
+            // { label: 'User', icon: 'pi pi-fw pi-user', to: '/users' },
+            // { label: 'Projects', icon: 'pi pi-fw pi-list', to: '/projects' },
+            // { label: 'Tasks', icon: 'pi pi-fw pi-check-square', to: '/tasks' }
         ]
     }
 ]);

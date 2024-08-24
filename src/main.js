@@ -21,6 +21,18 @@ router.beforeEach(async (to, from) => {
     }
 });
 
+import Echo from 'laravel-echo';
+import 'pusher-js';
+// require('pusher-js');
+window.Pusher = Pusher;
+
+window.Echo = new Echo({
+    broadcaster: 'pusher',
+    key: '2f6ad2c73ecbb3f9b61e',
+    cluster: 'ap2',
+    forceTLS: true
+});
+
 app.use(router);
 app.use(PrimeVue, {
     theme: {

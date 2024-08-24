@@ -248,7 +248,7 @@ function exportCSV() {
                 </div>
                 <div>
                     <label for="due_date" class="block font-bold mb-3">Due Date</label>
-                    <DatePicker showIcon fluid id="due_date" v-model="task.due_date" :invalid="errorMessages?.errors?.due_date != null"></DatePicker>
+                    <DatePicker dateFormat="yy-mm-dd" showIcon fluid id="due_date" v-model="task.due_date" :invalid="errorMessages?.errors?.due_date != null"></DatePicker>
                     <small v-if="errorMessages?.errors?.due_date != null" class="text-red-500">
                         <ul>
                             <li v-for="error of errorMessages.errors.due_date">{{ error }}</li>
